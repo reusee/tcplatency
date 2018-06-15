@@ -9,6 +9,7 @@
 #include <time.h>
 
 #define BUFSIZE 1024
+#define N 1000000
 
 //
 // copied from
@@ -70,21 +71,21 @@ int main(int argc, char **argv) {
     bzero(buf, 8);
     int64_t total = 0;
     struct timespec start, end;
-    for(int i = 0; i < 100; i++) {
-      clock_gettime(CLOCK_MONOTONIC, &start);
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    for(int i = 0; i < N; i++) {
       /* send the message line to the server */
       n = write(sockfd, buf, 8);
       if (n < 0) 
         error("ERROR writing to socket");
       n = read(sockfd, buf, 8);
-      clock_gettime(CLOCK_MONOTONIC, &end);
       if (n < 0) 
         error("ERROR reading from socket");
-      total += timespecDiff(&end, &start);
-      usleep(100000);
+      //usleep(100000);
     }
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    total = timespecDiff(&end, &start);
     printf("avg latency %ld nanoseconds (%ld microseconds)\n",
-      total/100, total/100000);
+      total/N, total/N/1000);
     close(sockfd);
     return 0;
 }
